@@ -30,6 +30,8 @@ class NewRequestViewController: UIViewController, UIPickerViewDataSource, UIPick
     @IBOutlet weak var jsonField: UITextView!
     @IBOutlet weak var sendRequestButton: UIButton!
     
+    private let networkingClient=NetworkingClient()
+    
     let requestTypes = ["GET", "POST", "PUT", "DELETE"]
     
     override func viewDidLoad() {
@@ -44,6 +46,7 @@ class NewRequestViewController: UIViewController, UIPickerViewDataSource, UIPick
         pickerView.delegate = self
         
         requestType.inputView = pickerView
+       //
     }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -61,7 +64,25 @@ class NewRequestViewController: UIViewController, UIPickerViewDataSource, UIPick
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         requestType.text = requestTypes[row]
     }
-
+    
+    @IBAction func executeRequest(_ sender: Any)
+    
+    {
+        guard let urlToExecute=URL(string:"https://jsonplaceholder.typicode.com/posts") else{
+            return
+        }
+        networkingClient.execute(urlToExecute){(json,error) in
+        if let error=error{
+            self.jsonField.text=error.localizedDescription
+            
+            }
+        
+        
+        else if let json=json {
+            self.jsonField.text=json.description
+        }
+        }
+    }
 
 }
 
