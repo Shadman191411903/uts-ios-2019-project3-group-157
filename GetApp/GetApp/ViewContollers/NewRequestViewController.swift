@@ -11,6 +11,8 @@ import Foundation
 
 class NewRequestViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
     
+    var valueInGetUrlField:String="";
+    
     @IBOutlet weak var requestType: UITextField!
     @IBOutlet weak var requestUrl: UITextField!
     
@@ -44,7 +46,7 @@ class NewRequestViewController: UIViewController, UIPickerViewDataSource, UIPick
         
         let pickerView = UIPickerView()
         pickerView.delegate = self
-        
+        //sendRequestButton.isEnabled=false
         requestType.inputView = pickerView
        //
     }
@@ -65,10 +67,35 @@ class NewRequestViewController: UIViewController, UIPickerViewDataSource, UIPick
         requestType.text = requestTypes[row]
     }
     
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if textField == requestUrl
+        {
+            let oldStr = requestUrl.text! as NSString
+            let newStr = oldStr.replacingCharacters(in: range, with: string) as NSString
+            if newStr.length == 0
+            {
+                
+                sendRequestButton.isUserInteractionEnabled = false
+                sendRequestButton.isEnabled=false
+            }else
+            {
+                sendRequestButton.isUserInteractionEnabled=true
+                sendRequestButton.isEnabled=true
+                
+            }
+        }
+        let set = NSCharacterSet(charactersIn: "ABCDEFGHIJKLMONPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@!:/. ").inverted
+        //Set maximum length of name to 14 and return if valid set
+        
+        return range.location < 100 && string.rangeOfCharacter(from: set) == nil
+    }
+    
     @IBAction func executeRequest(_ sender: Any)
     
     {
-        guard let urlToExecute=URL(string:"https://jsonplaceholder.typicode.com/posts") else{
+        valueInGetUrlField=requestUrl.text ?? "0"
+        print(valueInGetUrlField);
+        guard let urlToExecute=URL(string:valueInGetUrlField) else{
             return
         }
         networkingClient.execute(urlToExecute){(json,error) in
